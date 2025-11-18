@@ -1,0 +1,18 @@
+# Workflow Orchestrator Dependencies
+
+# Google ADK and Vertex AI
+google-adk>=1.18.0
+vertexai>=1.38.0
+
+# HTTP requests for MCP server communication
+requests>=2.31.0
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+# YAML configuration file support
+pyyaml>=6.0
+
+# Parallel execution (built-in with Python 3.2+)
+# concurrent.futures is part of the standard library
+
