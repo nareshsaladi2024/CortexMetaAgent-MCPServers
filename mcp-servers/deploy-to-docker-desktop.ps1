@@ -133,9 +133,10 @@ function Test-EnvironmentVariables {
             Write-Host "  - $var" -ForegroundColor Yellow
         }
         Write-Host ""
-        Write-Host "You can set them in PowerShell:" -ForegroundColor Yellow
-        Write-Host "  `$env:GOOGLE_API_KEY = 'your-key'" -ForegroundColor Gray
-        Write-Host "  `$env:GOOGLE_CLOUD_PROJECT = 'your-project-id'" -ForegroundColor Gray
+        Write-Host "You can set them using:" -ForegroundColor Yellow
+        Write-Host "  1. Helper script: .\set-docker-env-vars.ps1 -UseEnvFile -GoogleApiKey 'your-key'" -ForegroundColor Gray
+        Write-Host "  2. PowerShell: `$env:GOOGLE_API_KEY = 'your-key'" -ForegroundColor Gray
+        Write-Host "  3. Create .env file: Copy .env.example to .env and fill in values" -ForegroundColor Gray
         Write-Host ""
         $response = Read-Host "Continue anyway? (y/N)"
         if ($response -ne "y" -and $response -ne "Y") {
@@ -179,6 +180,17 @@ if (-not (Test-DockerCompose)) {
 }
 
 Write-Host ""
+
+# Check for .env file
+$envFile = Join-Path $ScriptDir ".env"
+if (Test-Path $envFile) {
+    Write-Host "Found .env file - environment variables will be loaded from it" -ForegroundColor Green
+    Write-Host ""
+} else {
+    Write-Host "No .env file found. You can create one using:" -ForegroundColor Yellow
+    Write-Host "  .\set-docker-env-vars.ps1 -UseEnvFile -GoogleApiKey 'your-key'" -ForegroundColor Gray
+    Write-Host ""
+}
 
 # Check environment variables
 if (-not (Test-EnvironmentVariables)) {

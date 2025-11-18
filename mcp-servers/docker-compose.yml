@@ -8,6 +8,8 @@ services:
     container_name: mcp-tokenstats
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - PORT=8000
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
@@ -28,6 +30,8 @@ services:
     container_name: mcp-agent-inventory
     ports:
       - "8001:8001"
+    env_file:
+      - .env
     environment:
       - PORT=8001
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
@@ -53,6 +57,8 @@ services:
     container_name: mcp-reasoning-cost
     ports:
       - "8002:8002"
+    env_file:
+      - .env
     environment:
       - PORT=8002
       - LLM_INPUT_TOKEN_PRICE_PER_M=${LLM_INPUT_TOKEN_PRICE_PER_M:-1.25}

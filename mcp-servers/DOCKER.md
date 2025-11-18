@@ -64,7 +64,20 @@ docker-compose logs -f mcp-reasoning-cost
 
 ## Environment Variables
 
-Create a `.env` file in the `mcp-servers` directory or set environment variables:
+### Method 1: Using Helper Script (Recommended)
+
+Use the helper script to create a `.env` file:
+
+```powershell
+cd mcp-servers
+.\set-docker-env-vars.ps1 -UseEnvFile -GoogleApiKey "your-api-key"
+```
+
+This will create a `.env` file that docker-compose will automatically load.
+
+### Method 2: Manual .env File
+
+Create a `.env` file in the `mcp-servers` directory:
 
 ```bash
 # Required for mcp-tokenstats
@@ -78,6 +91,25 @@ GOOGLE_CLOUD_LOCATION=us-central1
 # Optional pricing overrides for mcp-reasoning-cost
 LLM_INPUT_TOKEN_PRICE_PER_M=1.25
 LLM_OUTPUT_TOKEN_PRICE_PER_M=10.00
+```
+
+### Method 3: PowerShell Environment Variables
+
+Set environment variables in your PowerShell session:
+
+```powershell
+$env:GOOGLE_API_KEY = "your-gemini-api-key"
+$env:GOOGLE_CLOUD_PROJECT = "your-project-id"
+$env:GCP_PROJECT_NUMBER = "your-project-number"
+$env:GOOGLE_CLOUD_LOCATION = "us-central1"
+```
+
+**Note:** PowerShell environment variables are session-specific. Use `.env` file for persistence.
+
+### View Current Environment Variables
+
+```powershell
+.\set-docker-env-vars.ps1 -ShowCurrent
 ```
 
 ## Individual Server Builds
