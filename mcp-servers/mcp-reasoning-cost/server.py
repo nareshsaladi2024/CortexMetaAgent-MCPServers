@@ -5,8 +5,9 @@ Remote server for estimating reasoning costs based on chain-of-thought metrics
 
 import json
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, AsyncGenerator
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -151,7 +152,9 @@ def calculate_llm_cost(
             "estimated_cost_usd": None,
             "input_cost_usd": None,
             "output_cost_usd": None,
-            "model": model
+            "input_tokens": None,
+            "output_tokens": None,
+            "model": model or "default"
         }
     
     # Get pricing for model or use defaults
@@ -514,6 +517,137 @@ async def mcp_endpoint(request: Request):
                 "message": f"Internal error: {str(e)}"
             }
         }
+
+
+@app.post("/sse")
+async def mcp_sse_endpoint_post(request: Request):
+    """MCP protocol endpoint via Server-Sent Events (SSE) - POST method"""
+    return await mcp_sse_endpoint(request)
+
+@app.get("/sse")
+async def mcp_sse_endpoint(request: Request):
+    """
+    MCP protocol endpoint via Server-Sent Events (SSE)
+    For MCP Inspector streamable HTTP connections
+    """
+    async def event_stream() -> AsyncGenerator[str, None]:
+        try:
+            # Read the request body if present
+            body = {}
+            try:
+                body_text = await request.body()
+                if body_text:
+                    body = json.loads(body_text)
+            except:
+                pass
+            
+            # Extract JSON-RPC fields
+            jsonrpc = body.get("jsonrpc", "2.0")
+            method = body.get("method")
+            params = body.get("params", {})
+            request_id = body.get("id")
+            
+            # Handle different MCP methods
+            if method == "initialize":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {"tools": {}},
+                        "serverInfo": {"name": "reasoning-cost", "version": "1.0.0"}
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/list":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "tools": [
+                            {
+                                "name": "estimate_reasoning_cost",
+                                "description": "Estimate reasoning cost based on trace metrics. Returns both relative cost_score and actual LLM cost in USD if input/output tokens provided.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "trace": {
+                                            "type": "object",
+                                            "properties": {
+                                                "steps": {"type": "integer", "description": "Number of reasoning steps"},
+                                                "tool_calls": {"type": "integer", "description": "Number of tool invocations"},
+                                                "tokens_in_trace": {"type": "integer", "description": "Total tokens in the reasoning trace"},
+                                                "input_tokens": {"type": "integer", "description": "Input tokens for LLM cost calculation (optional)"},
+                                                "output_tokens": {"type": "integer", "description": "Output tokens for LLM cost calculation (optional)"},
+                                                "model": {"type": "string", "description": "Model name for pricing (e.g., 'gemini-2.5-pro', 'gpt-4'). Optional, defaults to gemini-2.5-pro pricing."}
+                                            },
+                                            "required": ["steps", "tool_calls", "tokens_in_trace"]
+                                        }
+                                    },
+                                    "required": ["trace"]
+                                }
+                            },
+                            {
+                                "name": "estimate_multiple_traces",
+                                "description": "Estimate reasoning cost for multiple traces (batch processing)",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "traces": {
+                                            "type": "array",
+                                            "description": "List of trace objects",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "steps": {"type": "integer"},
+                                                    "tool_calls": {"type": "integer"},
+                                                    "tokens_in_trace": {"type": "integer"}
+                                                },
+                                                "required": ["steps", "tool_calls", "tokens_in_trace"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["traces"]
+                                }
+                            }
+                        ]
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/call":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "error": {
+                        "code": -32603,
+                        "message": "Tool calls via SSE not yet fully implemented. Please use POST / endpoint for tool calls."
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            else:
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "error": {"code": -32601, "message": f"Method not found: {method}"}
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+        except Exception as e:
+            error_response = {
+                "jsonrpc": "2.0",
+                "id": body.get("id") if "body" in locals() else None,
+                "error": {"code": -32603, "message": f"Internal error: {str(e)}"}
+            }
+            yield f"data: {json.dumps(error_response)}\n\n"
+    
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 
 @app.get("/health")

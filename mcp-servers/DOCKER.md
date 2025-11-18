@@ -8,10 +8,36 @@ This directory contains Docker configurations for all three MCP servers:
 ## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose installed
+- Docker Desktop for Windows installed and running
+- Docker Compose installed (included with Docker Desktop)
 - Environment variables configured (see below)
 
-### Start All Servers
+### Deploy to Windows Docker Desktop (Recommended)
+
+Use the automated deployment script:
+
+```powershell
+cd mcp-servers
+.\deploy-to-docker-desktop.ps1
+```
+
+This script will:
+- Check if Docker is running
+- Verify environment variables
+- Build all Docker images
+- Start all containers
+- Display service URLs and status
+
+**Options:**
+- `-BuildOnly`: Only build images without starting containers
+- `-StartOnly`: Only start containers without rebuilding
+- `-Service <name>`: Deploy only a specific service
+- `-Stop`: Stop all running containers
+- `-Remove`: Stop and remove all containers and images
+
+### Start All Servers (Manual)
+
+Alternatively, you can use docker-compose directly:
 
 ```bash
 cd mcp-servers

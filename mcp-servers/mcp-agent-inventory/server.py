@@ -5,9 +5,10 @@ Remote server for tracking agent metadata, usage, and performance metrics
 
 import json
 import os
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, AsyncGenerator
 from datetime import datetime, timedelta
 from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -1249,6 +1250,103 @@ async def mcp_endpoint(request: Request):
                 "message": f"Internal error: {str(e)}"
             }
         }
+
+
+@app.post("/sse")
+async def mcp_sse_endpoint_post(request: Request):
+    """MCP protocol endpoint via Server-Sent Events (SSE) - POST method"""
+    return await mcp_sse_endpoint(request)
+
+@app.get("/sse")
+async def mcp_sse_endpoint(request: Request):
+    """
+    MCP protocol endpoint via Server-Sent Events (SSE)
+    For MCP Inspector streamable HTTP connections
+    """
+    async def event_stream() -> AsyncGenerator[str, None]:
+        try:
+            # Read the request body if present
+            body = {}
+            try:
+                body_text = await request.body()
+                if body_text:
+                    body = json.loads(body_text)
+            except:
+                pass
+            
+            # Extract JSON-RPC fields
+            jsonrpc = body.get("jsonrpc", "2.0")
+            method = body.get("method")
+            params = body.get("params", {})
+            request_id = body.get("id")
+            
+            # Handle different MCP methods - reuse existing endpoint logic
+            if method == "initialize":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {"tools": {}},
+                        "serverInfo": {"name": "agent-inventory", "version": "1.0.0"}
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/list":
+                # Return tools list
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "tools": [
+                            {"name": "list_local_agents", "description": "List all local agents in the inventory with their metadata", "inputSchema": {"type": "object", "properties": {}}},
+                            {"name": "get_local_agent_usage", "description": "Get detailed usage statistics for a specific local agent", "inputSchema": {"type": "object", "properties": {"agent_id": {"type": "string", "description": "The ID of the local agent"}}, "required": ["agent_id"]}},
+                            {"name": "register_agent", "description": "Register or update agent metadata", "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}, "description": {"type": "string"}, "avg_cost": {"type": "number"}, "avg_latency": {"type": "number"}}, "required": ["id", "description"]}},
+                            {"name": "record_execution", "description": "Record an agent execution in the inventory", "inputSchema": {"type": "object", "properties": {"agent_id": {"type": "string"}, "execution_id": {"type": "string"}, "timestamp": {"type": "string"}, "success": {"type": "boolean"}, "runtime_ms": {"type": "number"}, "input_tokens": {"type": "integer"}, "output_tokens": {"type": "integer"}, "total_tokens": {"type": "integer"}, "cost_usd": {"type": "number"}, "error_message": {"type": "string"}}, "required": ["agent_id"]}},
+                            {"name": "delete_agent", "description": "Delete an agent and all its execution records", "inputSchema": {"type": "object", "properties": {"agent_id": {"type": "string"}}, "required": ["agent_id"]}},
+                            {"name": "list_deployed_agents", "description": "List deployed agents from Google Cloud Vertex AI Reasoning Engine", "inputSchema": {"type": "object", "properties": {}}},
+                            {"name": "get_deployed_agent_usage", "description": "Get usage metrics from Google Cloud Monitoring for a specific deployed agent", "inputSchema": {"type": "object", "properties": {"agent_id": {"type": "string", "description": "The ID of the deployed agent in GCP (can be full resource name or just the ID)"}}, "required": ["agent_id"]}}
+                        ]
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/call":
+                # For tool calls, we need to use the existing endpoint logic
+                # But since we can't read body twice, we'll need to handle it here
+                # For now, return an error suggesting to use POST / instead
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "error": {
+                        "code": -32603,
+                        "message": "Tool calls via SSE not yet fully implemented. Please use POST / endpoint for tool calls."
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            else:
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "error": {"code": -32601, "message": f"Method not found: {method}"}
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+        except Exception as e:
+            error_response = {
+                "jsonrpc": "2.0",
+                "id": body.get("id") if "body" in locals() else None,
+                "error": {"code": -32603, "message": f"Internal error: {str(e)}"}
+            }
+            yield f"data: {json.dumps(error_response)}\n\n"
+    
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 
 @app.get("/health")

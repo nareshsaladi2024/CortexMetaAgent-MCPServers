@@ -5,8 +5,10 @@ Remote server for pulling token usage statistics from Gemini Flash 2.5
 
 import json
 import os
-from typing import Dict, Any, Optional
+import asyncio
+from typing import Dict, Any, Optional, AsyncGenerator
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
@@ -645,6 +647,173 @@ async def mcp_endpoint(request: Request):
                 "message": f"Internal error: {str(e)}"
             }
         }
+
+
+@app.post("/sse")
+async def mcp_sse_endpoint_post(request: Request):
+    """
+    MCP protocol endpoint via Server-Sent Events (SSE) - POST method
+    For MCP Inspector streamable HTTP connections
+    """
+    return await mcp_sse_endpoint(request)
+
+@app.get("/sse")
+async def mcp_sse_endpoint(request: Request):
+    """
+    MCP protocol endpoint via Server-Sent Events (SSE)
+    For MCP Inspector streamable HTTP connections
+    """
+    async def event_stream() -> AsyncGenerator[str, None]:
+        try:
+            # Read the request body if present
+            body = {}
+            try:
+                body_text = await request.body()
+                if body_text:
+                    body = json.loads(body_text)
+            except:
+                pass
+            
+            # Extract JSON-RPC fields
+            jsonrpc = body.get("jsonrpc", "2.0")
+            method = body.get("method")
+            params = body.get("params", {})
+            request_id = body.get("id")
+            
+            # Handle different MCP methods
+            if method == "initialize":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {
+                            "tools": {}
+                        },
+                        "serverInfo": {
+                            "name": "tokenstats",
+                            "version": "1.0.0"
+                        }
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/list":
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "result": {
+                        "tools": [
+                            {
+                                "name": "tokenize",
+                                "description": "Tokenize text and return token usage statistics with cost calculation using Gemini API pricing",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "model": {
+                                            "type": "string",
+                                            "description": "Model name (e.g., gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-pro). Defaults to gemini-2.5-flash if not specified."
+                                        },
+                                        "prompt": {
+                                            "type": "string",
+                                            "description": "Text to tokenize"
+                                        },
+                                        "generate": {
+                                            "type": "boolean",
+                                            "description": "If true, make actual API call to get real token counts and costs. If false, only count tokens and estimate costs.",
+                                            "default": False
+                                        }
+                                    },
+                                    "required": ["model", "prompt"]
+                                }
+                            }
+                        ]
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+            elif method == "tools/call":
+                tool_name = params.get("name")
+                tool_args = params.get("arguments", {})
+                
+                # Helper function to serialize result
+                def serialize_result(result):
+                    """Serialize result to JSON string, handling Pydantic models"""
+                    if hasattr(result, "model_dump"):
+                        return json.dumps(result.model_dump(), indent=2)
+                    elif hasattr(result, "dict"):
+                        return json.dumps(result.dict(), indent=2)
+                    else:
+                        return json.dumps(result, indent=2, default=str)
+                
+                # Route to appropriate handler
+                if tool_name == "tokenize":
+                    model = tool_args.get("model")
+                    prompt = tool_args.get("prompt")
+                    if not model or not prompt:
+                        response = {
+                            "jsonrpc": jsonrpc,
+                            "id": request_id,
+                            "error": {
+                                "code": -32602,
+                                "message": "model and prompt parameters are required"
+                            }
+                        }
+                        yield f"data: {json.dumps(response)}\n\n"
+                    else:
+                        tokenize_request = TokenizeRequest(model=model, prompt=prompt)
+                        result = await tokenize(tokenize_request)
+                        response = {
+                            "jsonrpc": jsonrpc,
+                            "id": request_id,
+                            "result": {
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": serialize_result(result)
+                                    }
+                                ]
+                            }
+                        }
+                        yield f"data: {json.dumps(response)}\n\n"
+                else:
+                    response = {
+                        "jsonrpc": jsonrpc,
+                        "id": request_id,
+                        "error": {
+                            "code": -32601,
+                            "message": f"Method not found: {tool_name}"
+                        }
+                    }
+                    yield f"data: {json.dumps(response)}\n\n"
+            else:
+                response = {
+                    "jsonrpc": jsonrpc,
+                    "id": request_id,
+                    "error": {
+                        "code": -32601,
+                        "message": f"Method not found: {method}"
+                    }
+                }
+                yield f"data: {json.dumps(response)}\n\n"
+        except Exception as e:
+            error_response = {
+                "jsonrpc": "2.0",
+                "id": body.get("id") if "body" in locals() else None,
+                "error": {
+                    "code": -32603,
+                    "message": f"Internal error: {str(e)}"
+                }
+            }
+            yield f"data: {json.dumps(error_response)}\n\n"
+    
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 
 @app.get("/health")

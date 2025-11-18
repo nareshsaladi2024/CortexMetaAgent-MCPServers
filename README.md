@@ -27,6 +27,37 @@ cd mcp-servers\mcp-tokenstats
 .\run-server.ps1
 ```
 
+### Deploy to Windows Docker Desktop
+
+```powershell
+# Deploy all services to Docker Desktop
+cd mcp-servers
+.\deploy-to-docker-desktop.ps1
+
+.\deploy-to-docker-desktop.ps1 -BuildOnly
+
+# Start only (without rebuilding)
+.\deploy-to-docker-desktop.ps1 -StartOnly
+
+# Deploy a specific service
+.\deploy-to-docker-desktop.ps1 -Service mcp-tokenstats
+
+# Stop all containers
+.\deploy-to-docker-desktop.ps1 -Stop
+
+# Remove all containers and images
+.\deploy-to-docker-desktop.ps1 -Remove
+```
+
+**Prerequisites:**
+- Docker Desktop for Windows must be installed and running
+- Required environment variables (see Environment Variables section)
+
+**Service URLs:**
+- mcp-tokenstats: http://localhost:8000
+- mcp-agent-inventory: http://localhost:8001
+- mcp-reasoning-cost: http://localhost:8002
+
 ### Deploy to Google Cloud Run
 
 ```powershell
@@ -38,6 +69,7 @@ cd mcp-servers
 
 - [Docker Setup](mcp-servers/DOCKER.md)
 - [Cloud Run Deployment](mcp-servers/CLOUD_RUN.md)
+- [MCP Inspector Connection Guide](mcp-servers/MCP_INSPECTOR.md)
 - [MCP Server Details](../../CortexEvalAI/MCP_SERVERS.md)
 
 ## Requirements

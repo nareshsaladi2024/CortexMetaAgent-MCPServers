@@ -250,10 +250,49 @@ $url = gcloud run services describe mcp-tokenstats --region us-central1 --format
 curl "$url/health"
 ```
 
+### Permission Denied Errors
+
+If you see `PERMISSION_DENIED` errors when running `gcloud builds submit`, your account lacks the required IAM roles.
+
+**Error message:**
+```
+ERROR: (gcloud.builds.submit) PERMISSION_DENIED: The caller does not have permission.
+```
+
+**Solution:**
+
+Ask a project owner to grant you the required roles:
+
+```powershell
+# Get your current account
+$account = gcloud config get-value account
+
+# Project owner runs these commands:
+gcloud projects add-iam-policy-binding aiagent-capstoneproject `
+  --member="user:$account" `
+  --role="roles/cloudbuild.builds.editor"
+
+gcloud projects add-iam-policy-binding aiagent-capstoneproject `
+  --member="user:$account" `
+  --role="roles/storage.admin"
+
+gcloud projects add-iam-policy-binding aiagent-capstoneproject `
+  --member="user:$account" `
+  --role="roles/run.admin"
+```
+
+**Required IAM Roles:**
+- `roles/cloudbuild.builds.editor` - Submit Cloud Build jobs
+- `roles/storage.admin` - Access Cloud Build storage buckets
+- `roles/run.admin` - Deploy to Cloud Run
+
+**Alternative:** If you're a project owner, you can grant yourself these permissions via the [Google Cloud Console](https://console.cloud.google.com/iam-admin/iam).
+
 ### Common Issues
 
 1. **Build fails**: Check Dockerfile syntax and dependencies
 2. **Deployment fails**: Verify environment variables are set
-3. **Service not accessible**: Check IAM permissions and authentication settings
-4. **High latency**: Consider increasing CPU/memory or setting min-instances > 0
+3. **Permission denied**: See "Permission Denied Errors" section above
+4. **Service not accessible**: Check IAM permissions and authentication settings
+5. **High latency**: Consider increasing CPU/memory or setting min-instances > 0
 
