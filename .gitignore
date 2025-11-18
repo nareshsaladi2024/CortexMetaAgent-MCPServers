@@ -45,10 +45,15 @@ Thumbs.db
 # Logs
 *.log
 
-# Service account keys (keep structure but ignore actual keys)
+# Service account keys and credentials
 *.json
 !package.json
 !package-lock.json
+# Explicitly ignore service account files
+**/aiagent-*.json
+**/*service-account*.json
+**/*credentials*.json
+**/*capstoneproject*.json
 
 # Docker
 .dockerignore
