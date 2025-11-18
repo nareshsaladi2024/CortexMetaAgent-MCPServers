@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Google Cloud Service Account credentials (NEVER commit these!)
+*-*.json
+*service-account*.json
+*credentials*.json
+aiagent-*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Data storage (if using file-based storage)
+*.db
+*.sqlite
+inventory_data.json
+

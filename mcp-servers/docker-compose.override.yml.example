@@ -1,0 +1,25 @@
+# Example override file for local development
+# Copy this to docker-compose.override.yml and customize as needed
+
+version: '3.8'
+
+services:
+  mcp-tokenstats:
+    environment:
+      - GOOGLE_API_KEY=your-api-key-here
+    volumes:
+      - ./mcp-tokenstats:/app  # Mount for live code changes
+
+  mcp-agent-inventory:
+    environment:
+      - GOOGLE_CLOUD_PROJECT=your-project-id
+      - GCP_PROJECT_NUMBER=your-project-number
+      - GCP_LOCATION=us-central1
+    volumes:
+      - ./mcp-agent-inventory:/app  # Mount for live code changes
+      - ./mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro
+
+  mcp-reasoning-cost:
+    volumes:
+      - ./mcp-reasoning-cost:/app  # Mount for live code changes
+

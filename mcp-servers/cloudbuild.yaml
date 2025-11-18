@@ -1,0 +1,75 @@
+# Cloud Build configuration for building MCP server images
+# Usage: gcloud builds submit --config=cloudbuild.yaml
+
+steps:
+  # Build mcp-tokenstats
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-tokenstats:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-tokenstats:$SHORT_SHA'
+      - './mcp-tokenstats'
+    id: 'build-tokenstats'
+
+  # Build mcp-agent-inventory
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-agent-inventory:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-agent-inventory:$SHORT_SHA'
+      - './mcp-agent-inventory'
+    id: 'build-agent-inventory'
+
+  # Build mcp-reasoning-cost
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-reasoning-cost:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mcp-reasoning-cost:$SHORT_SHA'
+      - './mcp-reasoning-cost'
+    id: 'build-reasoning-cost'
+
+  # Push mcp-tokenstats
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mcp-tokenstats:latest'
+    waitFor: ['build-tokenstats']
+    id: 'push-tokenstats'
+
+  # Push mcp-agent-inventory
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mcp-agent-inventory:latest'
+    waitFor: ['build-agent-inventory']
+    id: 'push-agent-inventory'
+
+  # Push mcp-reasoning-cost
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mcp-reasoning-cost:latest'
+    waitFor: ['build-reasoning-cost']
+    id: 'push-reasoning-cost'
+
+images:
+  - 'gcr.io/$PROJECT_ID/mcp-tokenstats:latest'
+  - 'gcr.io/$PROJECT_ID/mcp-tokenstats:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/mcp-agent-inventory:latest'
+  - 'gcr.io/$PROJECT_ID/mcp-agent-inventory:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/mcp-reasoning-cost:latest'
+  - 'gcr.io/$PROJECT_ID/mcp-reasoning-cost:$SHORT_SHA'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: '1200s'
+

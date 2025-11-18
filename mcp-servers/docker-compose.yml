@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  mcp-tokenstats:
+    build:
+      context: ./mcp-tokenstats
+      dockerfile: Dockerfile
+    container_name: mcp-tokenstats
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - ./mcp-tokenstats:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mcp-agent-inventory:
+    build:
+      context: ./mcp-agent-inventory
+      dockerfile: Dockerfile
+    container_name: mcp-agent-inventory
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECT}
+      - GCP_PROJECT_NUMBER=${GCP_PROJECT_NUMBER}
+      - GCP_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+    volumes:
+      - ./mcp-agent-inventory:/app
+      - ./mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mcp-reasoning-cost:
+    build:
+      context: ./mcp-reasoning-cost
+      dockerfile: Dockerfile
+    container_name: mcp-reasoning-cost
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - LLM_INPUT_TOKEN_PRICE_PER_M=${LLM_INPUT_TOKEN_PRICE_PER_M:-1.25}
+      - LLM_OUTPUT_TOKEN_PRICE_PER_M=${LLM_OUTPUT_TOKEN_PRICE_PER_M:-10.00}
+    volumes:
+      - ./mcp-reasoning-cost:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: mcp-servers-network
+
