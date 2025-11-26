@@ -152,7 +152,7 @@ python server.py
 # Transport: stdio
 # Command: python
 # Args: server.py
-# Working Directory: C:\AI Agents\CortexEvalAI-MCPServers\mcp-servers\mcp-tokenstats
+# Working Directory: C:\AI Agents\CortexMetaAgent-MCPServers\mcp-servers\mcp-tokenstats
 ```
 
 ## Troubleshooting

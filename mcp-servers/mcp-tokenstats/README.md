@@ -25,7 +25,7 @@ Remote MCP (Model Control Protocol) server for pulling token usage statistics fr
 ### 1. Install Dependencies
 
 ```powershell
-cd "C:\AI Agents\CortexEvalAI\mcp-servers\mcp-tokenstats"
+cd "C:\AI Agents\CortexMetaAgent\mcp-servers\mcp-tokenstats"
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt

@@ -20,7 +20,7 @@ Remote MCP (Model Control Protocol) server for tracking agent usage, executions,
 ### 1. Install Dependencies
 
 ```powershell
-cd "C:\AI Agents\CortexEvalAI\mcp-servers\mcp-agent-inventory"
+cd "C:\AI Agents\CortexMetaAgent\mcp-servers\mcp-agent-inventory"
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt

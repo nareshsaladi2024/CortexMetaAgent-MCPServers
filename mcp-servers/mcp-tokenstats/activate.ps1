@@ -1,5 +1,5 @@
 # Activation script for the virtual environment
-cd "C:\AI Agents\CortexEvalAI\mcp-servers\mcp-tokenstats"
+cd "C:\AI Agents\CortexMetaAgent\mcp-servers\mcp-tokenstats"
 if (Test-Path ".venv\Scripts\Activate.ps1") {
     & ".venv\Scripts\Activate.ps1"
     Write-Host "✅ Virtual environment activated" -ForegroundColor Green

@@ -1,6 +1,6 @@
-# CortexEvalAI MCP Servers
+# CortexMetaAgent MCP Servers
 
-This repository contains the Model Control Protocol (MCP) servers for the CortexEvalAI project.
+This repository contains the Model Control Protocol (MCP) servers for the CortexMetaAgent project.
 
 ## MCP Servers
 
@@ -70,7 +70,7 @@ cd mcp-servers
 - [Docker Setup](mcp-servers/DOCKER.md)
 - [Cloud Run Deployment](mcp-servers/CLOUD_RUN.md)
 - [MCP Inspector Connection Guide](mcp-servers/MCP_INSPECTOR.md)
-- [MCP Server Details](../../CortexEvalAI/MCP_SERVERS.md)
+- [MCP Server Details](../../CortexMetaAgent/MCP_SERVERS.md)
 
 ## Requirements
 

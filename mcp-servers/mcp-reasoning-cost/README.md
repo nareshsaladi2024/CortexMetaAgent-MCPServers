@@ -22,7 +22,7 @@ This server is used for:
 ### 1. Install Dependencies
 
 ```powershell
-cd "C:\AI Agents\CortexEvalAI\mcp-servers\mcp-reasoning-cost"
+cd "C:\AI Agents\CortexMetaAgent\mcp-servers\mcp-reasoning-cost"
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
