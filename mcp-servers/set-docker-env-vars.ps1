@@ -105,7 +105,7 @@ if ($UseEnvFile) {
         if ($apiKey) {
             $envContent += "GOOGLE_API_KEY=$apiKey"
         } else {
-            $envContent += "GOOGLE_API_KEY=your-google-api-key-here"
+            $envContent += "GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8"
         }
         
         $envContent += ""
@@ -122,7 +122,7 @@ if ($UseEnvFile) {
     
     # Add missing variables
     if (-not ($envContent -match '^GOOGLE_API_KEY=')) {
-        $envContent += "GOOGLE_API_KEY=$(if ($apiKey) { $apiKey } else { 'your-google-api-key-here' })"
+        $envContent += "GOOGLE_API_KEY=$(if ($apiKey) { $apiKey } else { 'AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8' })"
     }
     if (-not ($envContent -match '^GOOGLE_CLOUD_PROJECT=')) {
         $envContent += "GOOGLE_CLOUD_PROJECT=$(if ($projectId) { $projectId } else { 'aiagent-capstoneproject' })"

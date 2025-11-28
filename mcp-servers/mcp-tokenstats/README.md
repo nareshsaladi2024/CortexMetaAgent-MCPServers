@@ -42,14 +42,14 @@ Copy-Item .env.example .env
 Then edit `.env` and add your Google API key:
 
 ```env
-GOOGLE_API_KEY=your-actual-api-key-here
+GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8
 PORT=8000
 ```
 
 Or set it in PowerShell:
 
 ```powershell
-$env:GOOGLE_API_KEY = "your-api-key-here"
+$env:GOOGLE_API_KEY = "AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8"
 ```
 
 ### 3. Run the Server

@@ -6,7 +6,7 @@ version: '3.8'
 services:
   mcp-tokenstats:
     environment:
-      - GOOGLE_API_KEY=your-api-key-here
+      - GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8
     volumes:
       - ./mcp-tokenstats:/app  # Mount for live code changes
 

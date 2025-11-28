@@ -18,7 +18,7 @@ This guide explains how to deploy the MCP servers to Google Cloud Run for produc
 
 ```powershell
 # Required for mcp-tokenstats
-$env:GOOGLE_API_KEY = "your-gemini-api-key"
+$env:GOOGLE_API_KEY = "AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8"
 
 # Required for mcp-agent-inventory
 $env:GOOGLE_CLOUD_PROJECT = "aiagent-capstoneproject"
@@ -56,7 +56,7 @@ gcloud run deploy mcp-tokenstats `
   --platform managed `
   --region us-central1 `
   --allow-unauthenticated `
-  --set-env-vars GOOGLE_API_KEY=your-api-key `
+  --set-env-vars GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8 `
   --project aiagent-capstoneproject
 ```
 

@@ -81,7 +81,7 @@ Create a `.env` file in the `mcp-servers` directory:
 
 ```bash
 # Required for mcp-tokenstats
-GOOGLE_API_KEY=your-gemini-api-key
+GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8
 
 # Required for mcp-agent-inventory
 GOOGLE_CLOUD_PROJECT=your-project-id
@@ -98,7 +98,7 @@ LLM_OUTPUT_TOKEN_PRICE_PER_M=10.00
 Set environment variables in your PowerShell session:
 
 ```powershell
-$env:GOOGLE_API_KEY = "your-gemini-api-key"
+$env:GOOGLE_API_KEY = "AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8"
 $env:GOOGLE_CLOUD_PROJECT = "your-project-id"
 $env:GCP_PROJECT_NUMBER = "your-project-number"
 $env:GOOGLE_CLOUD_LOCATION = "us-central1"
@@ -137,7 +137,7 @@ docker build -t mcp-reasoning-cost:latest .
 docker run -d \
   --name mcp-tokenstats \
   -p 8000:8000 \
-  -e GOOGLE_API_KEY=your-api-key \
+  -e GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8 \
   mcp-tokenstats:latest
 
 # mcp-agent-inventory
