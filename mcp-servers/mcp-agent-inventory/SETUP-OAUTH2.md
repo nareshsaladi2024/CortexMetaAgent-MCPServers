@@ -8,17 +8,17 @@ You already have a service account JSON file. Use it by setting `GOOGLE_APPLICAT
 
 ### In your `.env` file:
 ```env
-GOOGLE_APPLICATION_CREDENTIALS=C:\AI Agents\Day5\sample_agent\aiagent-capstoneproject-10beb4eeaf31.json
+GOOGLE_APPLICATION_CREDENTIALS=C:\AI Agents\Day5\sample_agent\your-service-account.json
 ```
 
 ### Or in PowerShell (for current session):
 ```powershell
-$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\AI Agents\Day5\sample_agent\aiagent-capstoneproject-10beb4eeaf31.json"
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\AI Agents\Day5\sample_agent\your-service-account.json"
 ```
 
 ### Or set it permanently (User environment variable):
 ```powershell
-[Environment]::SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\AI Agents\Day5\sample_agent\aiagent-capstoneproject-10beb4eeaf31.json", "User")
+[Environment]::SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\AI Agents\Day5\sample_agent\your-service-account.json", "User")
 ```
 
 ## Option 2: Application Default Credentials (User Account)

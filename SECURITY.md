@@ -15,12 +15,12 @@ If you see this message, it means that service account credentials or API keys w
    ```powershell
    # Option 1: Using git filter-branch (built-in)
    git filter-branch --force --index-filter \
-     "git rm --cached --ignore-unmatch mcp-servers/mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json" \
+     "git rm --cached --ignore-unmatch mcp-servers/mcp-agent-inventory/your-service-account.json" \
      --prune-empty --tag-name-filter cat -- --all
    
    # Option 2: Using BFG Repo-Cleaner (faster, recommended)
    # Download from: https://rtyley.github.io/bfg-repo-cleaner/
-   bfg --delete-files aiagent-capstoneproject-10beb4eeaf31.json
+   bfg --delete-files your-service-account.json
    git reflog expire --expire=now --all
    git gc --prune=now --aggressive
    

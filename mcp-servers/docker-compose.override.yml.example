@@ -6,7 +6,7 @@ version: '3.8'
 services:
   mcp-tokenstats:
     environment:
-      - GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8
+      - GOOGLE_API_KEY=your-google-api-key-here
     volumes:
       - ./mcp-tokenstats:/app  # Mount for live code changes
 
@@ -17,7 +17,7 @@ services:
       - GCP_LOCATION=us-central1
     volumes:
       - ./mcp-agent-inventory:/app  # Mount for live code changes
-      - ./mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro
+      - ./mcp-agent-inventory/your-service-account.json:/app/credentials.json:ro
 
   mcp-reasoning-cost:
     volumes:

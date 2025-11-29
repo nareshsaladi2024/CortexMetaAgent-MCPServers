@@ -35,7 +35,7 @@ PORT=8001
 GCP_PROJECT_ID=your-gcp-project
 GCP_PROJECT_NUMBER=1276251306
 GCP_LOCATION=us-central1
-GCP_API_KEY=AIzaSyCI-zsRP85UVOi0DjtiCwWBwQ1djDy741g
+GCP_API_KEY=your-google-api-key-here
 ```
 
 Or set it in PowerShell:
@@ -45,7 +45,7 @@ $env:PORT = 8001
 $env:GCP_PROJECT_ID = "your-gcp-project"
 $env:GCP_PROJECT_NUMBER = "1276251306"
 $env:GCP_LOCATION = "us-central1"
-$env:GCP_API_KEY = "AIzaSyCI-zsRP85UVOi0DjtiCwWBwQ1djDy741g"
+$env:GCP_API_KEY = "your-google-api-key-here"
 ```
 
 **Note:** 

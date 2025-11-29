@@ -20,7 +20,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
     volumes:
       - ./mcp-agent-inventory:/app
-      - ./mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro
+      - ./mcp-agent-inventory/your-service-account.json:/app/credentials.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]

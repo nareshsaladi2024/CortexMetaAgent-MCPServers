@@ -81,7 +81,7 @@ Create a `.env` file in the `mcp-servers` directory:
 
 ```bash
 # Required for mcp-tokenstats
-GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8
+GOOGLE_API_KEY=your-google-api-key-here
 
 # Required for mcp-agent-inventory
 GOOGLE_CLOUD_PROJECT=your-project-id
@@ -98,7 +98,7 @@ LLM_OUTPUT_TOKEN_PRICE_PER_M=10.00
 Set environment variables in your PowerShell session:
 
 ```powershell
-$env:GOOGLE_API_KEY = "AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8"
+$env:GOOGLE_API_KEY = "your-google-api-key-here"
 $env:GOOGLE_CLOUD_PROJECT = "your-project-id"
 $env:GCP_PROJECT_NUMBER = "your-project-number"
 $env:GOOGLE_CLOUD_LOCATION = "us-central1"
@@ -137,7 +137,7 @@ docker build -t mcp-reasoning-cost:latest .
 docker run -d \
   --name mcp-tokenstats \
   -p 8000:8000 \
-  -e GOOGLE_API_KEY=AIzaSyAaPeS-PaJ0UGRG6vAMuSoa5joAOpdQ5O8 \
+  -e GOOGLE_API_KEY=your-google-api-key-here \
   mcp-tokenstats:latest
 
 # mcp-agent-inventory
@@ -146,7 +146,7 @@ docker run -d \
   -p 8001:8001 \
   -e GOOGLE_CLOUD_PROJECT=your-project-id \
   -e GCP_PROJECT_NUMBER=your-project-number \
-  -v $(pwd)/mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro \
+  -v $(pwd)/mcp-agent-inventory/your-service-account.json:/app/credentials.json:ro \
   mcp-agent-inventory:latest
 
 # mcp-reasoning-cost
@@ -222,7 +222,7 @@ The `mcp-agent-inventory` service requires Google Cloud credentials. The service
 
 ```yaml
 volumes:
-  - ./mcp-agent-inventory/aiagent-capstoneproject-10beb4eeaf31.json:/app/credentials.json:ro
+  - ./mcp-agent-inventory/your-service-account.json:/app/credentials.json:ro
 ```
 
 Ensure the file exists before starting the container.

@@ -119,7 +119,7 @@ function Test-EnvironmentVariables {
         }
         
         # Check for credentials file
-        $credPath = Join-Path $ScriptDir "mcp-agent-inventory\aiagent-capstoneproject-10beb4eeaf31.json"
+        $credPath = Join-Path $ScriptDir "mcp-agent-inventory\your-service-account.json"
         if (-not (Test-Path $credPath)) {
             Write-Host "WARNING: Credentials file not found: $credPath" -ForegroundColor Yellow
             Write-Host "         mcp-agent-inventory may not work without credentials." -ForegroundColor Yellow
