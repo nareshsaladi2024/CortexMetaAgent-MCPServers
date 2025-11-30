@@ -18,5 +18,5 @@ EXPOSE 8080
 
 # Run the server using uvicorn
 # Cloud Run sets PORT automatically, server.py reads it
-CMD exec uvicorn server:app --host 0.0.0.0 --port ${PORT:-8080}
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8002"]
 

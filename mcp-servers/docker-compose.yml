@@ -1,11 +1,10 @@
-version: '3.8'
-
 services:
 
   mcp-agent-inventory:
     build:
       context: ./mcp-agent-inventory
       dockerfile: Dockerfile
+    image: cortex-mcp-agent-inventory:latest
     container_name: mcp-agent-inventory
     ports:
       - "8001:8001"
@@ -13,14 +12,14 @@ services:
       - .env
     environment:
       - PORT=8001
-      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
-      - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-aiagent-capstoneproject}
+      - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECT:-aiagent-capstoneproject}
       - GCP_PROJECT_NUMBER=${GCP_PROJECT_NUMBER}
       - GCP_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/credentials.json}
     volumes:
       - ./mcp-agent-inventory:/app
-      - ./mcp-agent-inventory/your-service-account.json:/app/credentials.json:ro
+      - ../../kaggle-5-day-agents/service_account.json:/app/credentials.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
@@ -33,6 +32,7 @@ services:
     build:
       context: ./mcp-reasoning-cost
       dockerfile: Dockerfile
+    image: cortex-mcp-reasoning-cost:latest
     container_name: mcp-reasoning-cost
     ports:
       - "8002:8002"
@@ -42,6 +42,8 @@ services:
       - PORT=8002
       - LLM_INPUT_TOKEN_PRICE_PER_M=${LLM_INPUT_TOKEN_PRICE_PER_M:-1.25}
       - LLM_OUTPUT_TOKEN_PRICE_PER_M=${LLM_OUTPUT_TOKEN_PRICE_PER_M:-10.00}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-aiagent-capstoneproject}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
     volumes:
       - ./mcp-reasoning-cost:/app
     restart: unless-stopped
